@@ -1,24 +1,46 @@
 'use client'
 
-import { useState } from 'react'
-import { FaComments, FaTimes } from 'react-icons/fa'
+import { useState, useEffect } from 'react'
+import { FaComments, FaTimes, FaPaperPlane } from 'react-icons/fa'
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
 
+  useEffect(() => {
+    if (isOpen && messages.length === 0) {
+      handleBotReply("Welcome to EcoEarn! How can I assist you today?");
+    }
+  }, [isOpen]);
+
   const toggleChat = () => setIsOpen(!isOpen)
+
+  const handleBotReply = async (userMessage) => {
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          message: userMessage, 
+          chatHistory: messages.map(m => ({ role: m.sender, content: m.text }))
+        }),
+      });
+      const data = await response.json();
+      setMessages(prev => [...prev, { text: data.reply, sender: 'bot' }]);
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => [...prev, { text: "Sorry, I'm having trouble responding right now.", sender: 'bot' }]);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault()
     if (input.trim()) {
-      setMessages([...messages, { text: input, sender: 'user' }])
-      // Here you would typically send the message to your AI backend
-      // and get a response. For now, we'll just echo the message.
-      setTimeout(() => {
-        setMessages(prev => [...prev, { text: `You said: ${input}`, sender: 'bot' }])
-      }, 1000)
+      setMessages(prev => [...prev, { text: input, sender: 'user' }])
+      handleBotReply(input);
       setInput('')
     }
   }
@@ -28,7 +50,7 @@ export default function Chatbot() {
       {isOpen ? (
         <div className="bg-white rounded-lg shadow-xl w-80 h-96 flex flex-col">
           <div className="bg-green-600 text-white p-4 rounded-t-lg flex justify-between items-center">
-            <h3 className="font-bold">SustainAI Chatbot</h3>
+            <h3 className="font-bold">EcoEarn Assistant</h3>
             <button onClick={toggleChat} className="text-white hover:text-green-200">
               <FaTimes />
             </button>
@@ -52,7 +74,7 @@ export default function Chatbot() {
                 className="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <button type="submit" className="bg-green-500 text-white rounded-full p-2 hover:bg-green-600">
-                <FaComments />
+                <FaPaperPlane />
               </button>
             </div>
           </form>

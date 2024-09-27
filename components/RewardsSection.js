@@ -18,29 +18,29 @@ export default function RewardsSection() {
 
   return (
     <div className="bg-white shadow-xl rounded-lg p-6 mb-8">
-      <h2 className="text-3xl font-semibold mb-6 text-yellow-600">Available Rewards</h2>
+      <h2 className="text-3xl font-semibold mb-6 text-green-700">Available Rewards</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {rewards.map((reward) => (
           <div
             key={reward.id}
             className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-300 ${
-              selectedReward?.id === reward.id ? 'border-yellow-500 shadow-lg' : 'border-gray-200 hover:border-yellow-300 hover:shadow-md'
+              selectedReward?.id === reward.id ? 'border-green-500 shadow-lg' : 'border-gray-200 hover:border-green-300 hover:shadow-md'
             }`}
             onClick={() => handleRewardSelect(reward)}
           >
             <div className="bg-gray-100 rounded-md mb-4 p-4 flex items-center justify-center">
-              <FaGift className="text-5xl text-yellow-500" />
+              <FaGift className="text-5xl text-green-500" />
             </div>
-            <h3 className="font-semibold text-lg mb-2">{reward.name}</h3>
-            <p className="text-yellow-600 font-bold">{reward.points} points</p>
+            <h3 className="font-semibold text-lg mb-2 text-gray-800">{reward.name}</h3>
+            <p className="text-green-600 font-bold">{reward.points} points</p>
           </div>
         ))}
       </div>
       {selectedReward && (
-        <div className="mt-6 p-4 bg-yellow-100 rounded-lg">
-          <p className="font-semibold text-lg mb-2">Selected Reward: {selectedReward.name}</p>
-          <p className="mb-4">Points required: {selectedReward.points}</p>
-          <button className="bg-yellow-500 text-white px-6 py-2 rounded-full hover:bg-yellow-600 transition-colors duration-300 shadow-md">
+        <div className="mt-6 p-4 bg-green-100 rounded-lg">
+          <p className="font-semibold text-lg mb-2 text-gray-800">Selected Reward: {selectedReward.name}</p>
+          <p className="mb-4 text-gray-600">Points required: {selectedReward.points}</p>
+          <button className="bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition-colors duration-300 shadow-md">
             Redeem Reward
           </button>
         </div>
