@@ -1,6 +1,7 @@
+// pages/index.js
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FaCloudUploadAlt } from 'react-icons/fa';
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,23 @@ export default function Home() {
   const [previews, setPreviews] = useState([]);
   const [classifications, setClassifications] = useState([]);
   const [weight, setWeight] = useState('');
+  const [userId, setUserId] = useState('user123'); // Replace with actual user authentication
+  const [dashboardData, setDashboardData] = useState(null);
   const router = useRouter();
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [userId]);
+
+  const fetchDashboardData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/dashboard/${userId}`);
+      const data = await response.json();
+      setDashboardData(data);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    }
+  };
 
   const onDrop = useCallback((acceptedFiles) => {
     setFiles(acceptedFiles);
@@ -40,14 +57,37 @@ export default function Home() {
     formData.append('weight', weight);
 
     try {
-      const response = await fetch('http://localhost:5000/classify', {
+      const classifyResponse = await fetch('http://localhost:5000/classify', {
         method: 'POST',
         body: formData,
       });
-      const data = await response.json();
-      setClassifications(data.results);
+      const classifyData = await classifyResponse.json();
+      setClassifications(classifyData.results);
+
+      // Save to MongoDB
+      const recyclingEntry = {
+        userId,
+        weight: parseFloat(weight),
+        imageCount: files.length,
+        classifications: classifyData.results
+      };
+
+      const saveResponse = await fetch('http://localhost:5000/api/recycling-entry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(recyclingEntry),
+      });
+
+      if (saveResponse.ok) {
+        console.log('Entry saved successfully');
+        fetchDashboardData(); // Refresh dashboard data
+      } else {
+        console.error('Failed to save entry');
+      }
     } catch (error) {
-      console.error('Error classifying images:', error);
+      console.error('Error processing request:', error);
     }
   };
 
@@ -61,6 +101,29 @@ export default function Home() {
       <p className="text-2xl text-center mb-12 text-gray-600">
         Upload your waste images and earn rewards for recycling!
       </p>
+      {dashboardData && (
+        <div className="bg-green-100 p-6 rounded-lg shadow-lg mb-8">
+          <h2 className="text-2xl font-semibold mb-4 text-green-800">Your Recycling Dashboard</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-lg font-medium">Total Weight Recycled:</p>
+              <p className="text-xl font-bold">{dashboardData.totalWeight.toFixed(2)} kg</p>
+            </div>
+            <div>
+              <p className="text-lg font-medium">Total CO2 Saved:</p>
+              <p className="text-xl font-bold">{dashboardData.totalCO2Saved.toFixed(2)} kg</p>
+            </div>
+            <div>
+              <p className="text-lg font-medium">Total Trees Saved:</p>
+              <p className="text-xl font-bold">{dashboardData.totalTreesSaved.toFixed(2)}</p>
+            </div>
+            <div>
+              <p className="text-lg font-medium">Total Water Saved:</p>
+              <p className="text-xl font-bold">{dashboardData.totalWaterSaved.toFixed(2)} L</p>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="bg-white shadow-2xl rounded-lg p-8">
         <h2 className="text-3xl font-semibold mb-6 text-green-600">Upload Waste Images</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -130,7 +193,7 @@ export default function Home() {
           Find Trader
         </Button>
       </div>
-      
+      <EnvironmentalImpact weight={parseFloat(weight) || 0} imageCount={files.length} />
       <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="bg-green-100 p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
           <h3 className="text-xl font-semibold mb-4 text-green-700">Reduce</h3>
