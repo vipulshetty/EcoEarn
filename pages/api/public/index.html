@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive AI Bot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #f7f9fc;
+    }
+    .chat-container {
+      width: 60%;
+      max-width: 800px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .messages {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .messages p {
+      padding: 10px;
+      background: #e9f1fe;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .user-message {
+      background: #cce5ff;
+    }
+    .bot-message {
+      background: #f0f4f9;
+    }
+    .input-container {
+      display: flex;
+    }
+    .input-container input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .input-container button {
+      padding: 10px;
+      background: #4b90ff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h2>Interactive AI Chat Bot</h2>
+    <div class="messages" id="messages"></div>
+    <div class="input-container">
+      <input type="text" id="promptInput" placeholder="Enter your prompt here..." />
+      <button onclick="sendPrompt()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    // Function to display a welcome message
+    function displayWelcomeMessage() {
+      const messagesDiv = document.getElementById('messages');
+      const welcomeMessageElem = document.createElement('p');
+      welcomeMessageElem.textContent = "Welcome to the Interactive AI Chat Bot! How can I assist you today?";
+      welcomeMessageElem.classList.add('bot-message'); // Use the bot message styling
+      messagesDiv.appendChild(welcomeMessageElem);
+      
+      // Scroll to the bottom of the messages
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Call displayWelcomeMessage on page load
+    window.onload = displayWelcomeMessage;
+
+    async function sendPrompt() {
+      const promptInput = document.getElementById('promptInput');
+      const messagesDiv = document.getElementById('messages');
+      
+      // Get the user input
+      const userMessage = promptInput.value.trim();
+      if (!userMessage) return;
+
+      // Display the user message
+      const userMessageElem = document.createElement('p');
+      userMessageElem.textContent = userMessage;
+      userMessageElem.classList.add('user-message');
+      messagesDiv.appendChild(userMessageElem);
+
+      // Clear the input
+      promptInput.value = '';
+
+      try {
+        // Send the message to the server
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: userMessage }),
+        });
+        
+        const data = await response.json();
+        
+        // Display the bot's response
+        const botMessageElem = document.createElement('p');
+        botMessageElem.textContent = data.response;
+        botMessageElem.classList.add('bot-message');
+        messagesDiv.appendChild(botMessageElem);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+      
+      // Scroll to the bottom of the messages
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+  </script>
+</body>
+</html>

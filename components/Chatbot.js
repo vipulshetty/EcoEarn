@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { FaComments, FaTimes, FaPaperPlane } from 'react-icons/fa'
+import { useState, useEffect } from 'react';
+import { FaComments, FaTimes, FaPaperPlane } from 'react-icons/fa';
 
 export default function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState([])
-  const [input, setInput] = useState('')
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -14,9 +14,12 @@ export default function Chatbot() {
     }
   }, [isOpen]);
 
-  const toggleChat = () => setIsOpen(!isOpen)
+  const toggleChat = () => setIsOpen(!isOpen);
 
   const handleBotReply = async (userMessage) => {
+    // Add the user message to the state before making the request
+    setMessages(prev => [...prev, { text: userMessage, sender: 'user' }]);
+    
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -28,6 +31,12 @@ export default function Chatbot() {
           chatHistory: messages.map(m => ({ role: m.sender, content: m.text }))
         }),
       });
+
+      // Check if the response is OK
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       setMessages(prev => [...prev, { text: data.reply, sender: 'bot' }]);
     } catch (error) {
@@ -37,13 +46,12 @@ export default function Chatbot() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (input.trim()) {
-      setMessages(prev => [...prev, { text: input, sender: 'user' }])
       handleBotReply(input);
-      setInput('')
+      setInput('');
     }
-  }
+  };
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -88,5 +96,5 @@ export default function Chatbot() {
         </button>
       )}
     </div>
-  )
+  );
 }

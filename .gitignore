@@ -34,3 +34,33 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Flask
+instance/
+.webassets-cache
+
+# Next.js
+node_modules/
+.next/
+out/
+
+# Others
+.DS_Store
+.env
+.env.local
+
+model/plastic_waste_classifier.h5
+model/labels.txt
+
+venv/
+node_modules/
+*.pyc
+__pycache__/
+.env
+.env.local
