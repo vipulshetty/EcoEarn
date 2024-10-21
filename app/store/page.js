@@ -7,10 +7,10 @@ export default function RecycleStore() {
   const [cart, setCart] = useState([])
 
   const products = [
-    { id: 1, name: 'Recycled Notebook', price: 500, image: '/images/notebook.jpg' },
-    { id: 2, name: 'Eco-friendly Water Bottle', price: 750, image: '/images/water-bottle.jpg' },
-    { id: 3, name: 'Reusable Shopping Bag', price: 300, image: '/images/shopping-bag.jpg' },
-    { id: 4, name: 'Bamboo Toothbrush Set', price: 400, image: '/images/toothbrush.jpg' },
+    { id: 1, name: 'Recycled Notebook', price: 500, image: 'https://via.placeholder.com/150?text=Recycled+Notebook' },
+    { id: 2, name: 'Eco-friendly Water Bottle', price: 750, image: 'https://via.placeholder.com/150?text=Eco-friendly+Water+Bottle' },
+    { id: 3, name: 'Reusable Shopping Bag', price: 300, image: 'https://via.placeholder.com/150?text=Reusable+Shopping+Bag' },
+    { id: 4, name: 'Bamboo Toothbrush Set', price: 400, image: 'https://via.placeholder.com/150?text=Bamboo+Toothbrush+Set' },
   ]
 
   const addToCart = (product) => {

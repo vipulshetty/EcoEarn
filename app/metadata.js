@@ -1,6 +1,6 @@
 // app/metadata.js
 export const metadata = {
-    title: 'SustainAI',
+    title: 'EcoEarn',
     description: 'AI-Powered Plastic Waste Management Platform',
   }
   

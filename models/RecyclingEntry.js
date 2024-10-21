@@ -1,4 +1,3 @@
-// models/RecyclingEntry.js
 const mongoose = require('mongoose');
 
 const recyclingEntrySchema = new mongoose.Schema({

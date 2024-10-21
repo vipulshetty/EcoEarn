@@ -1,13 +1,12 @@
-// pages/api/dashboard/[userId].js
-import clientPromise from '../../../lib/mongodb'
+const clientPromise = require('../../../lib/mongodb');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
     try {
-      const client = await clientPromise
-      const db = client.db("eco_earn")
+      const client = await clientPromise;
+      const db = client.db("eco_earn");
 
-      const { userId } = req.query
+      const { userId } = req.query;
 
       const result = await db.collection("recycling_entries").aggregate([
         { $match: { userId: userId } },
@@ -19,7 +18,7 @@ export default async function handler(req, res) {
           totalWaterSaved: { $sum: '$waterSaved' },
           totalEntries: { $sum: 1 }
         }}
-      ]).toArray()
+      ]).toArray();
 
       const dashboardData = result[0] || { 
         totalWeight: 0, 
@@ -27,15 +26,15 @@ export default async function handler(req, res) {
         totalTreesSaved: 0, 
         totalWaterSaved: 0, 
         totalEntries: 0 
-      }
+      };
 
-      res.status(200).json(dashboardData)
+      res.status(200).json(dashboardData);
     } catch (e) {
-      console.error(e)
-      res.status(500).json({ error: 'Error fetching dashboard data' })
+      console.error(e);
+      res.status(500).json({ error: 'Error fetching dashboard data' });
     }
   } else {
-    res.setHeader('Allow', ['GET'])
-    res.status(405).end(`Method ${req.method} Not Allowed`)
+    res.setHeader('Allow', ['GET']);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-}
+};

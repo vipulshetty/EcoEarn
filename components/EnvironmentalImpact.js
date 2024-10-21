@@ -1,27 +1,45 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaRecycle, FaLeaf, FaTree, FaTint, FaImage } from 'react-icons/fa';
 
-export default function EnvironmentalImpact({ weight = 0, imageCount = 0 }) {
-  // Ensure weight is a number
-  const numWeight = Number(weight) || 0;
+export default function EnvironmentalImpact() {
+  const [impact, setImpact] = useState({
+    totalWeight: 0,
+    totalImageCount: 0,
+    totalCO2Saved: 0,
+    totalTreesSaved: 0,
+    totalWaterSaved: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Convert recycled waste to CO2 saved
-  // Assuming 1 kg of recycled plastic saves 2 kg of CO2 (this is a simplified estimate)
-  const co2Saved = numWeight * 2;
+  useEffect(() => {
+    async function fetchImpact() {
+      try {
+        const response = await fetch('/api/environmental-impact');
+        if (!response.ok) {
+          throw new Error('Failed to fetch environmental impact data');
+        }
+        const data = await response.json();
+        setImpact(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
 
-  // Calculate trees saved
-  // Assuming 1 tree absorbs about 22 kg of CO2 per year
-  const treesSaved = co2Saved / 22;
+    fetchImpact();
+  }, []);
 
-  // Calculate water saved
-  // Assuming recycling 1 kg of plastic saves about 17 liters of water
-  const waterSaved = numWeight * 17;
+  if (isLoading) {
+    return <div className="text-center">Loading environmental impact data...</div>;
+  }
 
-  // Calculate additional impact based on number of images uploaded
-  // This is a hypothetical calculation for demonstration purposes
-  const additionalImpact = imageCount * 0.1; // 0.1 kg of CO2 saved per image uploaded
+  if (error) {
+    return <div className="text-center text-red-500">Error: {error}</div>;
+  }
 
   return (
     <div className="bg-white shadow-xl rounded-lg p-6 transform hover:scale-105 transition-transform duration-300 mt-8">
@@ -30,16 +48,15 @@ export default function EnvironmentalImpact({ weight = 0, imageCount = 0 }) {
         <div className="bg-green-100 rounded-lg p-4 flex items-center">
           <FaRecycle className="text-4xl text-green-600 mr-4" />
           <div>
-            <p className="text-3xl font-bold text-green-700">{numWeight.toFixed(2)} kg</p>
+            <p className="text-3xl font-bold text-green-700">{impact.totalWeight.toFixed(2)} kg</p>
             <p className="text-lg text-green-600">Plastic Recycled</p>
           </div>
         </div>
         <div className="bg-blue-100 rounded-lg p-4 flex items-center">
           <FaLeaf className="text-4xl text-blue-600 mr-4" />
           <div>
-            <p className="text-3xl font-bold text-blue-700">{(co2Saved + additionalImpact).toFixed(2)} kg</p>
+            <p className="text-3xl font-bold text-blue-700">{impact.totalCO2Saved.toFixed(2)} kg</p>
             <p className="text-lg text-blue-600">Total CO2 Saved</p>
-            <p className="text-sm text-blue-500">({numWeight.toFixed(2)} kg × 2) + ({imageCount} images × 0.1)</p>
           </div>
         </div>
       </div>
@@ -47,26 +64,23 @@ export default function EnvironmentalImpact({ weight = 0, imageCount = 0 }) {
         <div className="bg-yellow-100 rounded-lg p-4 flex items-center">
           <FaTree className="text-4xl text-yellow-600 mr-4" />
           <div>
-            <p className="text-3xl font-bold text-yellow-700">{((co2Saved + additionalImpact) / 22).toFixed(2)}</p>
+            <p className="text-3xl font-bold text-yellow-700">{impact.totalTreesSaved.toFixed(2)}</p>
             <p className="text-lg text-yellow-600">Trees Equivalent</p>
-            <p className="text-sm text-yellow-500">({(co2Saved + additionalImpact).toFixed(2)} kg ÷ 22)</p>
           </div>
         </div>
         <div className="bg-cyan-100 rounded-lg p-4 flex items-center">
           <FaTint className="text-4xl text-cyan-600 mr-4" />
           <div>
-            <p className="text-3xl font-bold text-cyan-700">{waterSaved.toFixed(2)} L</p>
+            <p className="text-3xl font-bold text-cyan-700">{impact.totalWaterSaved.toFixed(2)} L</p>
             <p className="text-lg text-cyan-600">Water Saved</p>
-            <p className="text-sm text-cyan-500">({numWeight.toFixed(2)} kg × 17)</p>
           </div>
         </div>
       </div>
       <div className="mt-6 bg-purple-100 rounded-lg p-4 flex items-center">
         <FaImage className="text-4xl text-purple-600 mr-4" />
         <div>
-          <p className="text-3xl font-bold text-purple-700">{imageCount}</p>
+          <p className="text-3xl font-bold text-purple-700">{impact.totalImageCount}</p>
           <p className="text-lg text-purple-600">Images Uploaded</p>
-          <p className="text-sm text-purple-500">Additional Impact: {additionalImpact.toFixed(2)} kg CO2</p>
         </div>
       </div>
       <div className="mt-6 bg-gray-100 rounded-lg p-4">
@@ -75,7 +89,7 @@ export default function EnvironmentalImpact({ weight = 0, imageCount = 0 }) {
           <li>CO2 Saved: 1 kg of recycled plastic saves 2 kg of CO2</li>
           <li>Trees Equivalent: 1 tree absorbs about 22 kg of CO2 per year</li>
           <li>Water Saved: Recycling 1 kg of plastic saves about 17 liters of water</li>
-          <li>Additional Impact: Each uploaded image is assumed to save 0.1 kg of CO2 (for demonstration purposes)</li>
+          <li>Additional Impact: Each uploaded image is assumed to save 0.1 kg of CO2</li>
         </ul>
       </div>
     </div>

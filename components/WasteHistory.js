@@ -5,19 +5,42 @@ import { FaTrash, FaRecycle } from 'react-icons/fa'
 
 export default function WasteHistory() {
   const [history, setHistory] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    // Simulating API call
-    setTimeout(() => {
-      setHistory([
-        { date: '2023-09-15', type: 'Plastic', points: 50 },
-        { date: '2023-09-14', type: 'Paper', points: 30 },
-        { date: '2023-09-13', type: 'Glass', points: 40 },
-        { date: '2023-09-12', type: 'Plastic', points: 50 },
-        { date: '2023-09-11', type: 'Metal', points: 60 },
-      ])
-    }, 1000)
+    async function fetchWasteHistory() {
+      try {
+        const response = await fetch('/api/waste-history')
+        if (!response.ok) {
+          throw new Error('Failed to fetch waste history')
+        }
+        const data = await response.json()
+        setHistory(data)
+      } catch (err) {
+        console.error('Error:', err)
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchWasteHistory()
   }, [])
+
+  if (isLoading) {
+    return <div className="text-center p-4">Loading waste history...</div>
+  }
+
+  if (error) {
+    return (
+      <div className="text-center p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        <h2 className="text-xl font-bold mb-2">Error Loading Waste History</h2>
+        <p>{error}</p>
+        <p className="mt-2">Please try refreshing the page or contact support if the problem persists.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-white shadow-xl rounded-lg p-6">
@@ -28,6 +51,7 @@ export default function WasteHistory() {
             <tr>
               <th className="py-3 px-4 text-left">Date</th>
               <th className="py-3 px-4 text-left">Type</th>
+              <th className="py-3 px-4 text-left">Weight (kg)</th>
               <th className="py-3 px-4 text-left">Points Earned</th>
               <th className="py-3 px-4 text-left">Action</th>
             </tr>
@@ -37,9 +61,10 @@ export default function WasteHistory() {
               <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
                 <td className="py-3 px-4">{item.date}</td>
                 <td className="py-3 px-4">{item.type}</td>
+                <td className="py-3 px-4">{item.weight.toFixed(2)}</td>
                 <td className="py-3 px-4">{item.points}</td>
                 <td className="py-3 px-4">
-                  {item.type === 'Plastic' ? (
+                  {item.type.toLowerCase().includes('plastic') ? (
                     <FaRecycle className="text-green-500" />
                   ) : (
                     <FaTrash className="text-gray-500" />

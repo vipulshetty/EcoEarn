@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import PointsDisplay from '../../components/PointsDisplay'
-import EnvironmentalImpact from '../../components/EnvironmentalImpact'
-import RewardsSection from '../../components/RewardsSection'
-import WasteHistory from '../../components/WasteHistory'
+import PointsDisplay from '@/components/PointsDisplay'
+import EnvironmentalImpact from '@/components/EnvironmentalImpact'
+import RewardsSection from '@/components/RewardsSection'
+import WasteHistory from '@/components/WasteHistory'
 import { FaLeaf, FaRecycle, FaStore, FaGift } from 'react-icons/fa'
 
 export default function Dashboard() {
@@ -46,6 +46,7 @@ export default function Dashboard() {
                 <PointsDisplay />
                 <EnvironmentalImpact />
               </div>
+              <WasteHistory />
               <RewardsSection />
             </div>
           )}
