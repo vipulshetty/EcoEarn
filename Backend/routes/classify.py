@@ -4,6 +4,10 @@ from models.image_classifier import ImageClassifier
 classify_bp = Blueprint('classify', __name__)
 classifier = ImageClassifier()
 
+
+
+
+
 @classify_bp.route('/classify', methods=['POST'])
 def classify_image():
     if 'file' not in request.files:
